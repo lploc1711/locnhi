@@ -7,7 +7,7 @@ import { ROOM_CODE } from './blocks';
 
 export const heartBlocksRoutes: Routes = [{
   path: '',
-  title: 'Heart Blocks · and va em',
+  title: 'Block Blast · and va em',
   canActivate: [route => {
     const auth = inject(AuthService);
     const router = inject(Router);

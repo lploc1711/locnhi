@@ -48,11 +48,11 @@ export class RoomService {
     if (!result.committed) throw new Error('The move log changed.');
   }
 
-  async rematch(code: string, round: number, uid: string) {
+  async requestRematch(code: string, round: number, uid: string, partner: string) {
+    const ready = ref(this.db, `${this.path(code)}/matches/${round}/ready`);
     await set(ref(this.db, `${this.path(code)}/matches/${round}/ready/${uid}`), true);
-  }
-
-  async nextRound(code: string, round: number) {
+    const votes = (await get(ready)).val();
+    if (votes?.[uid] !== true || votes?.[partner] !== true) return;
     await runTransaction(ref(this.db, `${this.path(code)}/round`),
       current => current === round ? round + 1 : undefined, { applyLocally: false });
   }

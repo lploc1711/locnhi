@@ -1,4 +1,5 @@
-﻿import type { Routes } from '@angular/router';
+﻿import { inject } from '@angular/core';
+import { Router, type Routes } from '@angular/router';
 
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'login' },
@@ -12,8 +13,13 @@ export const routes: Routes = [
     loadChildren: () => import('./date-plans/date-plans.routes').then((m) => m.datePlansRoutes),
   },
   {
+    path: 'games',
+    loadChildren: () => import('./games/games.routes').then((m) => m.gamesRoutes),
+  },
+  {
     path: 'heart-blocks',
-    loadChildren: () => import('./heart-blocks/heart-blocks.routes').then((m) => m.heartBlocksRoutes),
+    pathMatch: 'full',
+    redirectTo: ({ queryParams }) => inject(Router).createUrlTree(['/games', 'block-blast'], { queryParams }),
   },
   { path: '**', redirectTo: 'login' },
 ];

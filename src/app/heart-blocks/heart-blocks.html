@@ -1,7 +1,7 @@
 <app-member-layout [focusMode]="!!room()?.guest">
   <div class="heart-game" [class.playing]="!!room()?.guest">
     @if (room()?.guest) {
-      <section class="match" aria-label="Ván Heart Blocks">
+      <section class="match" aria-label="Ván Block Blast">
         <div class="match-bar">
           <button type="button" class="quiet" (click)="exit()" aria-label="Về phòng chơi">← <span>Phòng</span></button>
           <span class="round">Ván {{ room()?.round }}</span>
@@ -60,21 +60,26 @@
               <button type="button" class="primary" (click)="forfeit()" [disabled]="saving() || !online()">Dừng ván</button>
             </div>
           </div>
-        } @else if (outcome(); as end) {
+        } @else if (outcome() || own()?.out) {
           <div class="result panel">
-            <strong>{{ end === 'win' ? 'Bạn thắng! ♥' : end === 'loss' ? 'Người ấy thắng! ♥' : 'Hòa nhau! ♥' }}</strong>
+            @if (outcome(); as end) {
+              <strong>{{ end === 'win' ? 'Bạn thắng! ♥' : end === 'loss' ? 'Người ấy thắng! ♥' : 'Hòa nhau! ♥' }}</strong>
+            } @else {
+              <p role="status">Bạn đã hết nước đi. Người ấy vẫn có thể chơi tiếp.</p>
+            }
             @if (room()!.round >= 20) {
-              <p>Phòng đã chơi đủ 20 ván.</p>
-              <button type="button" class="primary" (click)="exit()">Về sảnh</button>
+              @if (outcome()) {
+                <p>Phòng đã chơi đủ 20 ván.</p>
+                <button type="button" class="primary" (click)="exit()">Về sảnh</button>
+              }
             } @else {
               <button type="button" class="primary" (click)="playAgain()"
                 [disabled]="saving() || !online() || (ready() && !otherReady())">
-                {{ ready() ? otherReady() ? 'Mở ván mới' : 'Đang đợi người ấy…' : 'Chơi lại' }}
+                {{ ready() && !otherReady() ? 'Đang đợi người ấy…' : 'Tái đấu' }}
               </button>
+              @if (otherReady() && !ready()) { <p role="status">Người ấy muốn tái đấu.</p> }
             }
           </div>
-        } @else if (own()?.out) {
-          <p class="status" role="status">Bạn đã hết nước đi. Đợi người ấy chơi xong nhé.</p>
         } @else {
           <p class="status" role="status">{{ notice() || 'Kéo khối hoặc chạm vào khối rồi chọn một ô.' }}</p>
         }
@@ -82,7 +87,7 @@
     } @else {
       <section class="lobby panel" aria-labelledby="heart-title">
         <div class="heart-mark" aria-hidden="true">♥</div>
-        <h1 id="heart-title">Heart Blocks</h1>
+        <h1 id="heart-title">Block Blast</h1>
         @if (room()) {
           <p>Đợi người ấy vào phòng. Cả hai sẽ nhận cùng một bộ khối.</p>
           <label for="invite">Liên kết mời</label>

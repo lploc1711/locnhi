@@ -302,12 +302,12 @@ export class HeartBlocks {
 
   protected async playAgain() {
     const room = this.room();
-    if (!room || !this.outcome() || this.saving() || !this.online() || room.round >= 20) return;
+    if (!room || (!this.outcome() && !this.own()?.out) || this.saving() ||
+        !this.online() || room.round >= 20) return;
     this.saving.set(true);
     this.error.set('');
     try {
-      if (!this.ready()) await this.rooms.rematch(this.code(), room.round, this.uid());
-      if (this.otherReady()) await this.rooms.nextRound(this.code(), room.round);
+      await this.rooms.requestRematch(this.code(), room.round, this.uid(), this.otherId());
     } catch {
       this.error.set('Chưa mở được ván mới. Hãy thử lại.');
     } finally {

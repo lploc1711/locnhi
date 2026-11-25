@@ -210,8 +210,8 @@ under the exact name `FIREBASE_SERVICE_ACCOUNT_PLOCANDNHI`, then commit and push
 to `main`. Pull requests run validation without publishing. Service-account
 setup is described in the Firebase GitHub integration guide linked above.
 
-## Heart Blocks
+## Games · Block Blast
 
-Open **Heart Blocks** after signing in. Create a private room and share the invite link. A second Google account can join. Drag a piece, or select a piece then tap a board cell. Each player gets the same piece sequence and sees both scores. The higher score wins when both boards finish. Both players can ask for a rematch. A copied invite also restores a player's board when reopening the room.
+Open **Games → Block Blast** after signing in. Create a private room and share the invite link. A second Google account can join. Drag a piece, or select a piece then tap a board cell. Each player gets the same piece sequence and sees both scores. The higher score wins when both boards finish. A player who runs out of moves can ask for a rematch immediately. The next round starts after both players agree and the current round is finished. Older invite links still work. A copied invite also restores a player's board when reopening the room.
 
 The tab uses the existing Firebase Realtime Database. Apply the checked-in database rules to the same project as Hosting when releasing this feature. Run `npm run test:rules` for the local access and match protocol tests. Scores are replayed from each participant's append-only moves on both clients. This is a private casual game.

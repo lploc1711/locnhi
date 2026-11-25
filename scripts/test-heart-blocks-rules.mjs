@@ -29,7 +29,14 @@ export async function checkHeartBlocks({ alice, bob, visitor, outsider, allowed,
   await denied('moves cannot rewrite the log', () => set(ref(alice,self),'0Z1B2C'));
   await denied('a client cannot replace the whole room', () => set(ref(alice,room),initial));
   await denied('players cannot agree to a rematch midgame', () => set(ref(alice,`${room}/matches/1/ready/alice`),true));
-  await allowed('one player can record a forfeit', () => set(ref(bob,other),'!'));
+  await allowed('a finished player can ask for a rematch while their partner plays', async () => {
+    await set(ref(alice,self),'0A1B2C.');
+    await set(ref(alice,`${room}/matches/1/ready/alice`),true);
+    await set(ref(bob,other),'0D');
+    assert.equal((await get(ref(bob,`${room}/round`))).val(),1);
+  });
+  await denied('the player still playing cannot request a rematch yet', () => set(ref(bob,`${room}/matches/1/ready/bob`),true));
+  await allowed('one player can record a forfeit', () => set(ref(bob,other),'0D!'));
   await denied('a closed round cannot receive new moves', () => set(ref(alice,self),'0A1B2C'));
   await allowed('either participant can request a rematch', () => set(ref(alice,`${room}/matches/1/ready/alice`),true));
   await denied('one player cannot force the next round', () => set(ref(alice,`${room}/round`),2));

@@ -46,7 +46,7 @@ export class Login {
     try {
       const invite = this.route.snapshot.queryParamMap.get('heartRoom') ?? '';
       const destination = /^[0-9a-f]{24}$/.test(invite)
-        ? this.router.createUrlTree(['/heart-blocks'], { queryParams: { room: invite } })
+        ? this.router.createUrlTree(['/games', 'block-blast'], { queryParams: { room: invite } })
         : '/home';
       if (!(await this.router.navigateByUrl(destination, { replaceUrl: true }))) {
         this.navigationError.set(true);
