@@ -1,0 +1,56 @@
+<section class="plan-form" id="plan-form" aria-labelledby="form-title">
+  <div class="form-heading">
+    <h3 id="form-title">{{ plan() ? 'Chỉnh lại chiếc hẹn' : 'Một chiếc hẹn mới' }}</h3>
+    <button class="text-button" type="button" (click)="closed.emit()" [disabled]="saving()">
+      Đóng
+    </button>
+  </div>
+  <form #planForm="ngForm" (ngSubmit)="save()">
+    <div class="form-grid">
+      <label class="wide"
+        >Mình sẽ làm gì? <span class="required">*</span
+        ><input
+          #titleInput
+          name="title"
+          [(ngModel)]="draft.title"
+          required
+          maxlength="100"
+          placeholder="Ví dụ: Cà phê và ngắm hoàng hôn"
+          [disabled]="saving()"
+      /></label>
+      <label
+        >Ngày hẹn<input
+          type="date"
+          name="date"
+          [(ngModel)]="draft.date"
+          min="0001-01-01"
+          max="9999-12-31"
+          [disabled]="saving()"
+      /></label>
+      <label
+        >Ở đâu?<input
+          name="location"
+          [(ngModel)]="draft.location"
+          maxlength="160"
+          placeholder="Một nơi mình muốn đến"
+          [disabled]="saving()"
+      /></label>
+      <label class="wide"
+        >Gửi thêm một lời nhắn<textarea
+          name="note"
+          [(ngModel)]="draft.note"
+          [maxlength]="noteLimit"
+          rows="3"
+          placeholder="Nhớ mang máy ảnh, chọn một chiếc bàn cạnh cửa sổ..."
+          [disabled]="saving()"
+        ></textarea>
+      </label>
+    </div>
+    <div class="form-actions">
+      <span>Ngày và địa điểm có thể chọn sau.</span
+      ><button class="primary-button" type="submit" [disabled]="planForm.invalid || saving()">
+        {{ saving() ? 'Đang lưu...' : 'Cất cuộc hẹn' }}
+      </button>
+    </div>
+  </form>
+</section>

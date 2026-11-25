@@ -1,0 +1,34 @@
+﻿<app-member-layout [busy]="dates.saving()">
+  <article class="itinerary">
+    <a class="back-link" routerLink="/date-plans">Về Du an ma cua chung ta</a>
+    <header>
+      <span class="eyebrow">DỰ ÁN ĐẦU TIÊN CỦA CHÚNG MÌNH</span>
+      <h1>{{ itinerary.input.title }}</h1>
+      <p class="subtitle">Lịch trình và chi phí · Từ TP.HCM · Xe khách</p>
+      <div class="trip-facts">
+        <span>3 ngày 2 đêm</span><span>Ngày đi: Chưa chốt</span><span>Dự trù: 6–8 triệu/người</span>
+      </div>
+      <div class="save-area">
+        @if (saved()) {
+          <p class="saved-message" role="status">♡ Đã lưu trong sổ hẹn của bạn.</p>
+          <a routerLink="/date-plans" class="back-link">Xem và chỉnh sửa bản đã lưu</a>
+        } @else {
+          <button
+            type="button"
+            class="primary-button"
+            (click)="save()"
+            [disabled]="!dates.ready() || dates.saving()"
+          >
+            {{ dates.saving() ? 'Đang lưu...' : 'Lưu lịch trình vào sổ hẹn' }}
+          </button>
+          <p class="save-note">Lưu toàn bộ lịch trình vào tài khoản Google của bạn.</p>
+        }
+      </div>
+      @if (dates.error(); as error) {
+        <p class="error-message" role="alert">{{ error }}</p>
+      }
+      <p class="feedback" role="status">{{ feedback() }}</p>
+    </header>
+    <app-plan-document [content]="itinerary.input.note" />
+  </article>
+</app-member-layout>

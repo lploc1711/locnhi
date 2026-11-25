@@ -1,0 +1,57 @@
+﻿@for (block of blocks(); track $index) {
+  @switch (block.kind) {
+    @case ('heading') {
+      <h2><app-inline-text [text]="block.text" /></h2>
+    }
+    @case ('paragraph') {
+      <p><app-inline-text [text]="block.text" /></p>
+    }
+    @case ('quote') {
+      <blockquote><app-inline-text [text]="block.text" /></blockquote>
+    }
+    @case ('table') {
+      <div
+        class="table-scroll"
+        tabindex="0"
+        role="region"
+        aria-label="Bảng lịch trình hoặc chi phí"
+      >
+        <table>
+          <thead>
+            <tr>
+              @for (cell of block.headers; track $index) {
+                <th scope="col"><app-inline-text [text]="cell" /></th>
+              }
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of block.rows; track $index) {
+              <tr>
+                @for (cell of row; track $index) {
+                  <td><app-inline-text [text]="cell" /></td>
+                }
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+    @case ('list') {
+      <ul>
+        @for (item of block.items; track $index) {
+          <li><app-inline-text [text]="item.text" /></li>
+        }
+      </ul>
+    }
+    @case ('checklist') {
+      <ul class="checklist">
+        @for (item of block.items; track $index) {
+          <li>
+            <span aria-hidden="true">{{ item.checked ? '☑' : '☐' }}</span
+            ><app-inline-text [text]="item.text" />
+          </li>
+        }
+      </ul>
+    }
+  }
+}

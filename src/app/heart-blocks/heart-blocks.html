@@ -1,0 +1,115 @@
+<app-member-layout [focusMode]="!!room()?.guest">
+  <div class="heart-game" [class.playing]="!!room()?.guest">
+    @if (room()?.guest) {
+      <section class="match" aria-label="Ván Heart Blocks">
+        <div class="match-bar">
+          <button type="button" class="quiet" (click)="exit()" aria-label="Về phòng chơi">← <span>Phòng</span></button>
+          <span class="round">Ván {{ room()?.round }}</span>
+          @if (!outcome() && !own()?.out) {
+            <button type="button" class="quiet" (click)="confirmForfeit.set(true)" [disabled]="saving() || !online()">Dừng ván</button>
+          } @else { <span class="match-spacer"></span> }
+        </div>
+        <div class="scores" aria-live="polite" aria-atomic="true">
+          <div class="score own-score"><span>Bạn</span><strong>{{ own()?.score ?? '—' }}</strong></div>
+          <span class="score-heart" aria-hidden="true">♥</span>
+          <div class="score other-score"><span>Người ấy</span><strong>{{ other()?.score ?? '—' }}</strong></div>
+        </div>
+        @if (own(); as game) {
+          <div class="board" #arena role="group" aria-label="Bàn chơi của bạn" (pointerleave)="hover.set(null)">
+            @for (cell of game.board; track $index) {
+              <button type="button" class="cell"
+                [attr.data-cell]="$index" [attr.data-color]="cell || null"
+                [attr.tabindex]="$index === keyboardCell() ? 0 : -1"
+                [attr.aria-label]="'Ô ' + ($index + 1) + (cell ? ', đã có khối' : ', trống')"
+                [class.preview]="highlight().cells.has($index)"
+                [class.invalid]="highlight().cells.has($index) && !highlight().valid"
+                (focus)="previewCell($index)" (pointerenter)="previewCell($index)"
+                (keydown)="boardKey($event, $index)" (click)="placeCell($index)">
+              </button>
+            }
+          </div>
+          @if (!outcome() && !game.out) {
+            <div class="tray" role="group" aria-label="Chọn hoặc kéo một khối">
+              @for (piece of game.tray; track $index) {
+                @if (piece) {
+                  <button type="button" class="piece" [attr.aria-pressed]="selected() === $index"
+                    [attr.aria-label]="'Khối ' + ($index + 1) + ', ' + piece.cells.length + ' ô'"
+                    [disabled]="!canPlay()" (click)="select($index)"
+                    (pointerdown)="dragStart($event,$index)" (pointermove)="dragMove($event)"
+                    (pointerup)="dragEnd($event)" (pointercancel)="cancelDrag()"
+                    (lostpointercapture)="cancelDrag()">
+                    <span class="mini" [style.--columns]="piece.width" aria-hidden="true">
+                      @for (filled of pieceCells(piece); track $index) {
+                        <i [attr.data-color]="filled ? piece.color : null"></i>
+                      }
+                    </span>
+                  </button>
+                } @else { <span class="used" aria-hidden="true"></span> }
+              }
+            </div>
+          }
+        }
+        @if (!online()) { <p class="status" role="status">Đang kết nối lại…</p> }
+        @if (!own() || !other()) { <p class="status" role="alert">Dữ liệu ván chơi không hợp lệ.</p> }
+        @if (confirmForfeit()) {
+          <div class="result panel" role="alertdialog" aria-label="Xác nhận dừng ván">
+            <strong>Dừng ván này?</strong>
+            <p>Người ấy sẽ thắng ván hiện tại.</p>
+            <div class="actions">
+              <button type="button" class="quiet" (click)="confirmForfeit.set(false)">Chơi tiếp</button>
+              <button type="button" class="primary" (click)="forfeit()" [disabled]="saving() || !online()">Dừng ván</button>
+            </div>
+          </div>
+        } @else if (outcome(); as end) {
+          <div class="result panel">
+            <strong>{{ end === 'win' ? 'Bạn thắng! ♥' : end === 'loss' ? 'Người ấy thắng! ♥' : 'Hòa nhau! ♥' }}</strong>
+            @if (room()!.round >= 20) {
+              <p>Phòng đã chơi đủ 20 ván.</p>
+              <button type="button" class="primary" (click)="exit()">Về sảnh</button>
+            } @else {
+              <button type="button" class="primary" (click)="playAgain()"
+                [disabled]="saving() || !online() || (ready() && !otherReady())">
+                {{ ready() ? otherReady() ? 'Mở ván mới' : 'Đang đợi người ấy…' : 'Chơi lại' }}
+              </button>
+            }
+          </div>
+        } @else if (own()?.out) {
+          <p class="status" role="status">Bạn đã hết nước đi. Đợi người ấy chơi xong nhé.</p>
+        } @else {
+          <p class="status" role="status">{{ notice() || 'Kéo khối hoặc chạm vào khối rồi chọn một ô.' }}</p>
+        }
+      </section>
+    } @else {
+      <section class="lobby panel" aria-labelledby="heart-title">
+        <div class="heart-mark" aria-hidden="true">♥</div>
+        <h1 id="heart-title">Heart Blocks</h1>
+        @if (room()) {
+          <p>Đợi người ấy vào phòng. Cả hai sẽ nhận cùng một bộ khối.</p>
+          <label for="invite">Liên kết mời</label>
+          <input id="invite" type="url" [value]="inviteUrl()" readonly (focus)="$any($event.target).select()" />
+          <div class="actions">
+            <button type="button" class="primary" (click)="copyInvite()">Sao chép liên kết</button>
+            <button type="button" class="quiet" (click)="exit()">Về sảnh</button>
+          </div>
+          <p class="status" role="status">{{ notice() || 'Đang đợi người ấy…' }}</p>
+        } @else {
+          <p>Hai người, hai bàn. Xếp khối, xóa hàng hoặc cột và xem ai ghi nhiều điểm hơn.</p>
+          <button type="button" class="primary" (click)="create()" [disabled]="busy() || !online()">Tạo phòng</button>
+          <form class="join" (ngSubmit)="join()">
+            <label for="room-code">Mã phòng của người ấy</label>
+            <div>
+              <input id="room-code" name="roomCode" type="text" maxlength="24" autocomplete="off"
+                autocapitalize="none" spellcheck="false" [ngModel]="joinCode()"
+                (ngModelChange)="joinCode.set($event)" placeholder="Nhập mã phòng" />
+              <button type="submit" class="quiet join-button" [disabled]="busy() || !online()">Tham gia</button>
+            </div>
+          </form>
+          @if (busy() || !online()) {
+            <p class="status" role="status">{{ busy() ? 'Đang mở phòng…' : 'Đang kết nối…' }}</p>
+          }
+        }
+      </section>
+    }
+    @if (error()) { <p class="status failure" role="alert">{{ error() }}</p> }
+  </div>
+</app-member-layout>

@@ -6,7 +6,12 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "firebase:login": "firebase login",
+    "predeploy": "npm run build",
+    "deploy": "firebase deploy --only hosting --project plocandnhi",
+    "deploy:rules": "firebase deploy --only database --project plocandnhi",
+    "test:rules": "firebase emulators:exec --project demo-and-va-em --only database \"node scripts/test-database-rules.mjs\""
   },
   "private": true,
   "packageManager": "npm@11.20.0",
@@ -25,6 +30,7 @@
     "@angular/build": "^22.3.0",
     "@angular/cli": "^22.3.0",
     "@angular/compiler-cli": "^22.3.0",
+    "firebase-tools": "15.37.0",
     "jsdom": "^31.0.0",
     "prettier": "^3.8.1",
     "typescript": "~6.0.2",

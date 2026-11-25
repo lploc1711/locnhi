@@ -1,0 +1,56 @@
+:host {
+  display: block;
+  justify-self: center;
+}
+.love-note {
+  justify-self: center;
+  position: relative;
+  width: 285px;
+  background: #f9d7e7;
+  padding: 36px 28px 28px;
+  text-align: center;
+  transform: rotate(5deg);
+  box-shadow: 2px 9px 19px #8e3b6510;
+}
+.tape {
+  position: absolute;
+  top: -12px;
+  left: calc(50% - 40px);
+  width: 80px;
+  height: 29px;
+  background: #d68bac78;
+  transform: rotate(-8deg);
+}
+.note-flower {
+  display: block;
+  color: var(--rose);
+  font-size: 34px;
+  margin-bottom: 10px;
+}
+.note-label {
+  font-size: 0.7rem;
+  letter-spacing: 2px;
+  color: #88526c;
+  text-transform: uppercase;
+}
+.love-note p {
+  font: 1.65rem/1.5 var(--serif-font);
+  margin: 22px 0;
+}
+.love-note em {
+  color: var(--rose);
+}
+.note-signature {
+  font: 0.85rem var(--hand-font);
+  color: #88526c;
+}
+
+@media (max-width: 700px) {
+  .love-note {
+    width: 250px;
+    padding: 24px;
+  }
+  .love-note p {
+    font-size: 1.5rem;
+  }
+}

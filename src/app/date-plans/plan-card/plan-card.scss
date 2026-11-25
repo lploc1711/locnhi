@@ -1,0 +1,118 @@
+:host {
+  display: flex;
+  min-width: 0;
+}
+.plan-card {
+  border: 1px solid #edc3d6;
+  background: #fde8f1;
+  padding: 24px;
+  border-radius: 3px;
+  display: flex;
+  flex-direction: column;
+  overflow-wrap: anywhere;
+}
+.plan-card.blush {
+  background: #fbdce9;
+  border-color: #ebbad0;
+}
+.plan-card.sage {
+  background: #f5e5f0;
+  border-color: #e4c5db;
+}
+.card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.plan-status {
+  font-size: 0.75rem;
+  color: #8c496a;
+}
+.is-done .plan-status {
+  color: #84305b;
+}
+.card-stamp {
+  border: 1px dashed #c2779f;
+  padding: 6px;
+  color: #94617c;
+  font: italic 0.8rem var(--serif-font);
+  transform: rotate(9deg);
+}
+.plan-card h3 {
+  font-size: 1.5rem;
+  font-weight: 400;
+  line-height: 1.4;
+  margin: 22px 0 18px;
+}
+.plan-date,
+.plan-location {
+  display: flex;
+  gap: 10px;
+  color: #80516c;
+  font-size: 0.85rem;
+  margin: 0 0 10px;
+  line-height: 1.6;
+}
+.plan-note {
+  color: var(--muted);
+  font-size: 0.875rem;
+  line-height: 1.8;
+  white-space: pre-wrap;
+  margin: 10px 0 24px;
+}
+.card-actions {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  margin-top: auto;
+  padding-top: 20px;
+  border-top: 1px solid #c2779f40;
+}
+.complete-button {
+  color: #8c355e;
+  border: 0;
+  background: none;
+  padding: 6px 0;
+  font-size: 0.8rem;
+  text-align: left;
+}
+.complete-button:hover {
+  text-decoration: underline;
+}
+.card-actions .text-button:nth-child(2) {
+  margin-left: auto;
+}
+.delete-confirm {
+  border-top: 1px solid var(--line);
+  margin-top: 12px;
+  padding-top: 6px;
+  font-size: 0.85rem;
+}
+.delete-confirm button {
+  border: 1px solid #d59ab6;
+  background: transparent;
+  color: var(--ink);
+  border-radius: 3px;
+  padding: 7px 10px;
+  margin-right: 8px;
+}
+
+.plan-card {
+  flex: 1;
+}
+.long-note {
+  margin: 10px 0 20px;
+  font-size: 0.875rem;
+  line-height: 1.8;
+}
+.long-note summary {
+  cursor: pointer;
+  color: var(--rose);
+}
+.itinerary-link {
+  color: var(--rose);
+  font-size: 0.875rem;
+  margin: 0 0 18px;
+  text-underline-offset: 4px;
+}

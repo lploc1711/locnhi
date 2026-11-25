@@ -1,0 +1,34 @@
+﻿<div class="member-shell" [class.game-focus]="focusMode()">
+  <header class="member-header">
+    <app-brand link="/home" />
+    <nav aria-label="Điều hướng chính">
+      <a routerLink="/home" routerLinkActive="nav-active" ariaCurrentWhenActive="page">Trang chủ</a>
+      <a routerLink="/date-plans" routerLinkActive="nav-active" ariaCurrentWhenActive="page"
+        >Du an ma cua chung ta</a
+      >
+      <a routerLink="/heart-blocks" routerLinkActive="nav-active" ariaCurrentWhenActive="page">Heart Blocks</a>
+    </nav>
+    <div class="user-menu">
+      <span>{{ auth.user()?.displayName || 'Người thương' }}</span
+      ><button
+        class="text-button"
+        type="button"
+        (click)="auth.signOut()"
+        [disabled]="auth.busy() || busy()"
+      >
+        {{ auth.busy() ? 'Đang đăng xuất...' : 'Đăng xuất' }}
+      </button>
+    </div>
+  </header>
+  <main>
+    @if (auth.error(); as error) {
+      <p class="error-message" role="alert">{{ error }}</p>
+    }
+    <ng-content />
+  </main>
+  <footer class="member-footer">
+    <app-brand link="/home" [compact]="true" /><span
+      >Gom những ngày bình thường thành những kỷ niệm.</span
+    >
+  </footer>
+</div>

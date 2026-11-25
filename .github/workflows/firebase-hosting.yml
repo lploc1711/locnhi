@@ -24,10 +24,11 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: '26'
+          cache: npm
           package-manager-cache: false
 
       - name: Install dependencies
-        run: npm install --no-audit --no-fund
+        run: npm ci --no-audit --no-fund
 
       - name: Run unit tests
         run: npm test -- --watch=false
@@ -38,10 +39,10 @@ jobs:
       - name: Check deployment credentials
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         env:
-          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_LOCNHI_C2D95 }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_PLOCANDNHI }}
         run: |
           if [ -z "$FIREBASE_SERVICE_ACCOUNT" ]; then
-            echo '::error::Add the FIREBASE_SERVICE_ACCOUNT_LOCNHI_C2D95 repository secret to deploy.'
+            echo '::error::Add the FIREBASE_SERVICE_ACCOUNT_PLOCANDNHI repository secret to deploy.'
             exit 1
           fi
 
@@ -49,6 +50,6 @@ jobs:
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_LOCNHI_C2D95 }}
-          projectId: locnhi-c2d95
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_PLOCANDNHI }}
+          projectId: plocandnhi
           channelId: live

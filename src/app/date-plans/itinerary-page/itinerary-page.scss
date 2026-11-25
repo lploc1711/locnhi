@@ -1,0 +1,61 @@
+﻿:host {
+  display: block;
+}
+.itinerary {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 36px 0 56px;
+}
+.back-link {
+  display: inline-block;
+  color: var(--rose);
+  font-size: 0.875rem;
+  text-underline-offset: 5px;
+  margin-bottom: 28px;
+}
+header {
+  padding: 12px 0 8px;
+}
+h1 {
+  font-size: clamp(2rem, 4.5vw, 3rem);
+  font-weight: 400;
+  line-height: 1.25;
+  margin: 18px 0;
+}
+.subtitle {
+  color: var(--muted);
+  line-height: 1.7;
+}
+.trip-facts {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 24px 0;
+}
+.trip-facts span {
+  padding: 8px 12px;
+  background: #f9d7e7;
+  border-radius: 30px;
+  font-size: 0.8rem;
+}
+.save-area {
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 22px 0;
+  margin: 28px 0 12px;
+}
+.save-note,
+.feedback {
+  color: var(--muted);
+  font-size: 0.875rem;
+  line-height: 1.7;
+}
+.saved-message {
+  color: var(--rose);
+}
+.save-area .back-link {
+  margin: 0;
+}
+.feedback {
+  min-height: 20px;
+}

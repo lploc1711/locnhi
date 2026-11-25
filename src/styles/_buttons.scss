@@ -1,0 +1,24 @@
+.text-button {
+  background: none;
+  border: 0;
+  color: var(--muted);
+  padding: 6px 0;
+  font-size: 0.8rem;
+}
+.text-button:hover {
+  color: var(--rose);
+  text-decoration: underline;
+}
+.primary-button {
+  border: 1px solid #a52b60;
+  border-radius: 5px;
+  background: var(--rose);
+  color: #fff9fc;
+  min-height: 44px;
+  padding: 12px 20px;
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+.primary-button:hover {
+  background: #962451;
+}

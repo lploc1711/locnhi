@@ -1,0 +1,116 @@
+<app-member-layout [busy]="dates.saving()">
+  <section id="our-plans" class="plans-section" aria-labelledby="plans-title">
+    <div class="section-heading">
+      <div>
+        <span class="eyebrow">NHỮNG ĐIỀU MÌNH CÙNG ẤP Ủ</span>
+        <h1 id="plans-title">Du an ma cua chung ta</h1>
+        <p>Lên một chiếc hẹn, để có thêm một điều mong chờ.</p>
+      </div>
+      <button
+        class="primary-button add-plan"
+        type="button"
+        (click)="openForm()"
+        [disabled]="!dates.ready() || dates.saving()"
+        [attr.aria-expanded]="formOpen()"
+        aria-controls="plan-form"
+      >
+        <span aria-hidden="true">+</span> Thêm cuộc hẹn
+      </button>
+    </div>
+
+    @if (!hasItinerary()) {
+      <a class="featured-itinerary" routerLink="/date-plans/da-lat-3n2d">
+        <span class="eyebrow">DỰ ÁN ĐẦU TIÊN</span>
+        <h2>Đà Lạt 3N2Đ | Adventure &amp; Chill</h2>
+        <p>Dù lượn, zipline, săn mây và những ngày có nhau.</p>
+        <div><span>Ngày đi: Chưa chốt</span><span>Dự trù: 6–8 triệu/người</span></div>
+        <span class="read-itinerary">Xem lịch trình và chi phí</span>
+      </a>
+    }
+    <div class="plans-toolbar">
+      <div class="filters" role="group" aria-label="Lọc cuộc hẹn">
+        <button
+          type="button"
+          [class.selected]="filter() === 'all'"
+          [attr.aria-pressed]="filter() === 'all'"
+          (click)="filter.set('all')"
+        >
+          Tất cả <span>{{ dates.plans().length }}</span>
+        </button>
+        <button
+          type="button"
+          [class.selected]="filter() === 'planned'"
+          [attr.aria-pressed]="filter() === 'planned'"
+          (click)="filter.set('planned')"
+        >
+          Đang ấp ủ <span>{{ pendingCount() }}</span>
+        </button>
+        <button
+          type="button"
+          [class.selected]="filter() === 'done'"
+          [attr.aria-pressed]="filter() === 'done'"
+          (click)="filter.set('done')"
+        >
+          Đã cùng nhau <span>{{ dates.completed() }}</span>
+        </button>
+      </div>
+      <span class="sync-note">Lưu theo tài khoản Google của bạn</span>
+    </div>
+
+    @if (formOpen()) {
+      <app-plan-editor
+        [plan]="editingPlan()"
+        [saving]="dates.saving()"
+        (saved)="save($event)"
+        (closed)="closeForm()"
+      />
+    }
+    @if (dates.error(); as error) {
+      <p class="error-message" role="alert">{{ error }}</p>
+    }
+    <p class="feedback" role="status">{{ feedback() }}</p>
+
+    @if (dates.loading()) {
+      <div class="empty-state" role="status">
+        <span class="spinner" aria-hidden="true"></span>
+        <p>Đang mở sổ hẹn của mình...</p>
+      </div>
+    } @else if (visiblePlans().length) {
+      <div class="plan-grid">
+        @for (plan of visiblePlans(); track plan.id; let i = $index) {
+          <app-plan-card
+            [plan]="plan"
+            [detailLink]="plan.id === itinerary.id ? '/date-plans/da-lat-3n2d' : null"
+            [tone]="i"
+            [busy]="dates.saving() || !dates.ready()"
+            (completed)="toggle($event)"
+            (edited)="openForm($event)"
+            (removed)="remove($event)"
+          />
+        }
+      </div>
+    } @else if (dates.ready()) {
+      <div class="empty-state">
+        <div class="empty-letter" aria-hidden="true">♡</div>
+        <h3>
+          {{
+            filter() === 'all'
+              ? 'Trang đầu tiên đang chờ mình viết.'
+              : 'Chưa có cuộc hẹn nào ở đây.'
+          }}
+        </h3>
+        <p>
+          {{
+            filter() === 'all'
+              ? 'Một bữa tối, một buổi dạo phố, hay chỉ là ngồi cạnh nhau.'
+              : 'Những điều đẹp đẽ sẽ dần được cất vào đây.'
+          }}
+        </p>
+        <button class="text-button empty-add" type="button" (click)="openForm()">
+          {{ filter() === 'all' ? 'Viết cuộc hẹn đầu tiên' : 'Thêm một cuộc hẹn' }}
+        </button>
+      </div>
+    }
+    <p class="section-footnote handwritten">the best plans are the ones with you.</p>
+  </section>
+</app-member-layout>

@@ -1,0 +1,80 @@
+﻿:host {
+  display: block;
+  line-height: 1.85;
+  overflow-wrap: anywhere;
+}
+h2 {
+  font-weight: 400;
+  color: var(--rose);
+  font-size: 1.65rem;
+  line-height: 1.4;
+  margin: 42px 0 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line);
+}
+p {
+  white-space: pre-line;
+  margin: 16px 0;
+}
+blockquote {
+  margin: 20px 0;
+  border-left: 3px solid var(--rose);
+  background: #fde8f1;
+  padding: 16px 20px;
+}
+ul {
+  padding-left: 24px;
+}
+li {
+  margin: 10px 0;
+}
+.checklist {
+  padding: 0;
+  list-style: none;
+}
+.checklist li {
+  display: flex;
+  gap: 12px;
+}
+.checklist span {
+  color: var(--rose);
+  flex-shrink: 0;
+}
+.table-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  margin: 20px 0;
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  text-align: left;
+  font-size: 0.9rem;
+}
+th,
+td {
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+th {
+  background: #f9d7e7;
+  color: #7f3b5b;
+  font-weight: 600;
+}
+td:first-child {
+  min-width: 125px;
+}
+tr:last-child td {
+  border-bottom: 0;
+}
+@media (max-width: 600px) {
+  h2 {
+    font-size: 1.4rem;
+  }
+  th,
+  td {
+    padding: 10px 12px;
+  }
+}

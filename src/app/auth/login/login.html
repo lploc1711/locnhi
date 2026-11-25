@@ -1,0 +1,89 @@
+﻿<main class="letter-page" [class.is-open]="opened()">
+  <header class="letter-header">
+    <app-brand />
+    <span class="header-note">a little corner, just for us</span>
+  </header>
+
+  <section
+    class="invitation"
+    aria-labelledby="login-title"
+    [attr.aria-busy]="auth.loading() || auth.busy() || opened()"
+  >
+    <div class="intro">
+      <span class="eyebrow">MỘT LÁ THƯ DÀNH CHO EM</span>
+      <h1 id="login-title">Có một cuộc hẹn<br />đang chờ <em>chúng mình.</em></h1>
+      <p>Những nơi muốn đến. Những điều muốn làm.<br />Và thật nhiều ngày có nhau.</p>
+    </div>
+
+    <div class="envelope-scene" aria-hidden="true">
+      <span class="spark spark-one">✧</span>
+      <div class="envelope">
+        <div class="envelope-back"></div>
+        <div class="letter-paper">
+          <span class="paper-kicker">gửi người thương,</span>
+          <span class="paper-title">Mình đi hẹn hò nhé?</span>
+          <span class="paper-line"></span><span class="paper-line short"></span>
+          <span class="paper-signature">with love, and va em ♡</span>
+        </div>
+        <div class="envelope-front"></div>
+        <div class="envelope-flap"></div>
+        <span class="wax-seal">♡</span>
+        <span class="envelope-address">to: you, always.</span>
+      </div>
+      <span class="handwritten envelope-caption">a small letter. a thousand little plans.</span>
+    </div>
+
+    <div class="letter-actions">
+      @if (auth.loading()) {
+        <p class="status" role="status">
+          <span class="spinner" aria-hidden="true"></span>Đang tìm lá thư của bạn...
+        </p>
+      } @else if (opened()) {
+        <p class="status opening-status" role="status">
+          Thư đã mở. Chào mừng về góc nhỏ của mình ♡
+        </p>
+        @if (navigationError()) {
+          <button class="google-button" type="button" (click)="enterHome()">Vào trang chủ</button>
+        }
+      } @else {
+        <button
+          class="google-button"
+          type="button"
+          (click)="auth.signIn()"
+          [disabled]="auth.busy()"
+        >
+          @if (auth.busy()) {
+            <span class="spinner" aria-hidden="true"></span>
+          } @else {
+            <svg width="19" height="19" viewBox="0 0 48 48" aria-hidden="true">
+              <path
+                fill="#4285F4"
+                d="M43.6 24.5c0-1.4-.1-2.8-.4-4.1H24v7.8h11a9.4 9.4 0 0 1-4.1 6.2v5.2h6.7c3.9-3.6 6-8.9 6-15.1Z"
+              />
+              <path
+                fill="#34A853"
+                d="M24 44c5.4 0 10-1.8 13.3-4.9l-6.7-5.2c-1.8 1.2-4 1.9-6.6 1.9-5.2 0-9.6-3.5-11.2-8.2H5.9V33A20 20 0 0 0 24 44Z"
+              />
+              <path
+                fill="#FBBC05"
+                d="M12.8 27.6a12 12 0 0 1 0-7.2V15H5.9a20 20 0 0 0 0 18l6.9-5.4Z"
+              />
+              <path
+                fill="#EA4335"
+                d="M24 12.2c2.9 0 5.5 1 7.5 2.9l5.6-5.6A19 19 0 0 0 24 4 20 20 0 0 0 5.9 15l6.9 5.4c1.6-4.7 6-8.2 11.2-8.2Z"
+              />
+            </svg>
+          }
+          {{ auth.busy() ? 'Đang kết nối Google...' : 'Mở thư bằng Google' }}
+        </button>
+        <p class="login-note">Đăng nhập để mở thư và lên kế hoạch cho những cuộc hẹn.</p>
+      }
+      @if (auth.error(); as error) {
+        <p class="error-message" role="alert">{{ error }}</p>
+      }
+    </div>
+  </section>
+  <footer class="letter-footer">
+    <span>made for the two of us</span><span>mỗi cuộc hẹn, một kỷ niệm ♡</span>
+  </footer>
+</main>

@@ -1,0 +1,73 @@
+<article
+  class="plan-card"
+  [class.is-done]="plan().done"
+  [class.blush]="tone() % 3 === 1"
+  [class.sage]="tone() % 3 === 2"
+>
+  <div class="card-top">
+    <span class="plan-status">{{ plan().done ? '♡ Đã cùng nhau' : '✧ Đang ấp ủ' }}</span><span
+      class="card-stamp"
+      aria-hidden="true"
+      >a & e</span
+    >
+  </div>
+  <h3>{{ plan().title }}</h3>
+  <p class="plan-date"><span aria-hidden="true">◷</span>{{ formatDate(plan().date) }}</p>
+  @if (plan().location) {
+    <p class="plan-location"><span aria-hidden="true">⌖</span>{{ plan().location }}</p>
+  }
+  @if (plan().note) {
+    @if (plan().note.length > 280) {
+      <details class="long-note">
+        <summary>Xem toàn bộ ghi chú</summary>
+        <p class="plan-note">{{ plan().note }}</p>
+      </details>
+    } @else {
+      <p class="plan-note">{{ plan().note }}</p>
+    }
+  }
+  @if (detailLink(); as link) {
+    <a class="itinerary-link" [routerLink]="link">Xem lịch trình gốc</a>
+  }
+  <div class="card-actions">
+    <button
+      type="button"
+      class="complete-button"
+      (click)="completed.emit(plan())"
+      [disabled]="busy()"
+      [attr.aria-label]="
+        (plan().done ? 'Đánh dấu chưa thực hiện: ' : 'Đánh dấu đã thực hiện: ') + plan().title
+      "
+    >
+      {{ plan().done ? 'Lại muốn đi cùng nhau' : 'Mình đã đi rồi' }}</button><button
+      type="button"
+      class="text-button"
+      (click)="edited.emit(plan())"
+      [disabled]="busy()"
+      [attr.aria-label]="'Sửa: ' + plan().title"
+    >
+      Sửa</button
+    ><button
+      type="button"
+      class="text-button delete-button"
+      (click)="deleting.set(true)"
+      [disabled]="busy()"
+      [attr.aria-label]="'Xóa: ' + plan().title"
+    >
+      Xóa
+    </button>
+  </div>
+  @if (deleting()) {
+    <div class="delete-confirm">
+      <p>Xóa cuộc hẹn này khỏi sổ?</p>
+      <button type="button" (click)="removed.emit(plan())" [disabled]="busy()">
+        {{ busy() ? 'Đang xóa...' : 'Xóa cuộc hẹn' }}</button><button
+        type="button"
+        (click)="deleting.set(false)"
+        [disabled]="busy()"
+      >
+        Giữ lại
+      </button>
+    </div>
+  }
+</article>

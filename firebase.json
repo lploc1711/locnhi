@@ -1,9 +1,15 @@
 {
+  "database": {
+    "rules": "database.rules.json"
+  },
+  "emulators": {
+    "database": { "host": "127.0.0.1", "port": 9000 },
+    "ui": { "enabled": false },
+    "singleProjectMode": true
+  },
   "hosting": {
     "public": "dist/locnhi/browser",
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
-    "rewrites": [
-      { "source": "**", "destination": "/index.html" }
-    ]
+    "rewrites": [{ "source": "**", "destination": "/index.html" }]
   }
 }
