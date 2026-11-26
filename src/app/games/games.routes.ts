@@ -10,6 +10,10 @@ export const gamesRoutes: Routes = [
     loadComponent: () => import('./games').then(m => m.Games),
   },
   {
+    path: 'party',
+    loadChildren: () => import('../couple-party/party.routes').then(m => m.partyRoutes),
+  },
+  {
     path: 'block-blast',
     loadChildren: () => import('../heart-blocks/heart-blocks.routes').then(m => m.heartBlocksRoutes),
   },

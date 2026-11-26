@@ -20,6 +20,14 @@ import { MemberLayout } from '../shared/member-layout/member-layout';
             <span class="launch">Chơi ngay <span aria-hidden="true">→</span></span>
           </span>
         </a>
+        <a class="game-card party-card" routerLink="/games/party">
+          <span class="party-icon" aria-hidden="true">♥</span>
+          <span class="game-copy">
+            <strong>Couple Games</strong>
+            <span>Hiểu nhau hơn hoặc thi giải đố trong phòng riêng.</span>
+            <span class="launch">Chơi ngay <span aria-hidden="true">→</span></span>
+          </span>
+        </a>
       </section>
     </app-member-layout>
   `,
@@ -32,6 +40,11 @@ import { MemberLayout } from '../shared/member-layout/member-layout';
       padding: clamp(14px, 4vw, 24px); border: 1px solid #ead3e0; border-radius: 22px;
       color: #40243c; background: #fff7fb; text-decoration: none;
       box-shadow: 0 8px 22px #54264410;
+    }
+    .party-card { margin-top: 14px; }
+    .party-icon {
+      display: grid; place-items: center; width: clamp(76px, 22vw, 124px); aspect-ratio: 1;
+      border-radius: 12px; color: #82395f; background: #f2dce8; font-size: clamp(2rem, 7vw, 3rem);
     }
     .game-card:hover { border-color: #ba6f97; }
     .game-card:focus-visible { outline: 3px solid #8851b3; outline-offset: 4px; }

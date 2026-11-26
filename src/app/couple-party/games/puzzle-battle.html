@@ -1,0 +1,106 @@
+@if (room().phase === 'WAITING' || room().phase === 'READY') {
+  @if (room().seat === 0) {
+    <fieldset>
+      <legend>{{ tr('Round settings', 'Cài đặt vòng chơi') }}</legend>
+      <label>{{ tr('Puzzle type', 'Loại câu đố') }}
+        <select [ngModel]="options().type" (ngModelChange)="setType($event)">
+          @for (type of types; track type[0]) { <option [value]="type[0]">{{ local(type[1]) }}</option> }
+        </select>
+      </label>
+      <label>{{ tr('Difficulty', 'Độ khó') }}
+        <select [ngModel]="options().difficulty" (ngModelChange)="setDifficulty($event)">
+          @for (difficulty of difficulties; track $index) {
+            <option [ngValue]="$index">{{ local(difficulty) }}</option>
+          }
+        </select>
+      </label>
+      <button type="button" (click)="save()" [disabled]="!live() || !changed()">{{ tr('Save settings', 'Lưu cài đặt') }}</button>
+    </fieldset>
+  } @else {
+    <p>{{ typeName(settings().type) }} · {{ local(difficulties[settings().difficulty]) }}</p>
+  }
+}
+
+@if (state(); as game) {
+  <ul class="scoreboard" [attr.aria-label]="tr('Rounds won', 'Số vòng thắng')">
+    @for (player of room().players; track $index) {
+      <li><strong>{{ player.name }}</strong><span>{{ game.wins[$index] }} / 3</span></li>
+    }
+  </ul>
+  @if (game.timeLimitReached) {
+    <p role="status">{{ tr('Time ran out before either player won three rounds.', 'Hết giờ trước khi có người thắng ba vòng.') }}</p>
+  }
+  @if (game.stage !== 'finished') {
+    <div class="timing">
+      <h3>{{ tr('Round', 'Vòng') }} {{ game.heat }} · {{ typeName(game.type) }}</h3>
+      @if (game.stage === 'race') { <span [attr.aria-label]="tr('Time remaining', 'Thời gian còn lại')">{{ seconds(game.deadline) }} s</span> }
+    </div>
+  }
+  @switch (game.stage) {
+    @case ('countdown') {
+      <p>{{ instruction(game.type) }}</p>
+      <div class="countdown">{{ tr('Starting in', 'Bắt đầu sau') }} {{ seconds(game.startsAt) }}</div>
+    }
+    @case ('race') {
+      <div class="progress">
+        <label>{{ tr('You', 'Bạn') }} {{ game.progress }} / {{ game.target }}
+          <progress [value]="game.progress ?? 0" [max]="game.target ?? 1"></progress>
+        </label>
+        <label>{{ room().players[1 - room().seat].name }} {{ game.opponentProgress }} / {{ game.target }}
+          <progress [value]="game.opponentProgress ?? 0" [max]="game.target ?? 1"></progress>
+        </label>
+      </div>
+      @if (game.board; as board) {
+        @if (board.prompt; as prompt) {
+          <p class="clue">{{ local(prompt) }}</p>
+        } @else if (board.sequence; as sequence) {
+          <div class="pattern">
+            @for (value of sequence; track $index) {
+              <span role="img" [attr.aria-label]="symbolName(value)">{{ symbol(value) }}</span>
+            }
+          </div>
+        } @else {
+          <p>{{ instruction(game.type) }}</p>
+        }
+        @if (board.pieces; as pieces) {
+          <div class="pieces" [attr.aria-label]="tr('Pieces', 'Các khối')">
+            @for (piece of pieces; track $index) {
+              <button type="button" (click)="choosePiece($index)" [attr.aria-pressed]="selection().index === $index">
+                {{ $index + 1 }}{{ board.placed?.[$index] ? ' ✓' : '' }}
+              </button>
+            }
+          </div>
+          @if (preview().length) {
+            <div class="piece-controls">
+              <div class="preview" role="img" [attr.aria-label]="tr('Selected piece', 'Khối đã chọn')">
+                @for (filled of preview(); track $index) { <span [class.filled]="filled"></span> }
+              </div>
+              <button type="button" (click)="rotate()">{{ tr('Rotate', 'Xoay khối') }}</button>
+              @if (board.placed?.[selection().index]) {
+                <button type="button" (click)="remove()" [disabled]="!live()">{{ tr('Remove', 'Bỏ khối') }}</button>
+              }
+            </div>
+          }
+        }
+        @if (board.wrong) { <p role="status">{{ tr('Try another answer in a moment.', 'Chờ một chút rồi thử đáp án khác.') }}</p> }
+        <app-puzzle-canvas [cells]="cells()" [columns]="columns()" [label]="typeName(game.type)" (pick)="pick($event)" />
+      }
+    }
+    @case ('round-result') {
+      @if (game.history.at(-1); as latest) {
+        <p role="status">{{ latest.winner < 0 ? tr('Time ran out. No point this round.', 'Hết giờ. Không ai ghi điểm vòng này.') :
+          room().players[latest.winner].name + tr(' solved it first!', ' đã giải nhanh nhất!') }}</p>
+        <p>{{ tr('Next round in', 'Vòng tiếp theo sau') }} {{ seconds(game.nextAt ?? 0) }} s</p>
+      }
+    }
+  }
+  @if (game.history.length && (game.stage === 'round-result' || game.stage === 'finished')) {
+    <h4>{{ tr('Round results', 'Kết quả từng vòng') }}</h4>
+    <ol class="results">
+      @for (round of game.history; track round.heat) {
+        <li>{{ typeName(round.type) }} ·
+          {{ round.winner < 0 ? tr('Timed out', 'Hết giờ') : room().players[round.winner].name + ' · ' + (round.elapsedMs / 1000).toFixed(1) + ' s' }}</li>
+      }
+    </ol>
+  }
+}

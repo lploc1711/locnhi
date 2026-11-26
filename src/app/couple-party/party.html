@@ -1,0 +1,87 @@
+<app-member-layout>
+  <section class="party" aria-labelledby="party-title" [attr.lang]="vietnamese() ? 'vi' : 'en'">
+    <header>
+      <a routerLink="/games">{{ text('← Games', '← Trò chơi') }}</a>
+      <button type="button" class="secondary" (click)="vietnamese.set(!vietnamese())"
+        [attr.lang]="vietnamese() ? 'en' : 'vi'">{{ vietnamese() ? 'English' : 'Tiếng Việt' }}</button>
+    </header>
+    <h1 id="party-title">{{ text('Couple Games', 'Trò chơi cho hai người') }}</h1>
+    @switch (connection.status()) {
+      @case ('connecting') { <p role="status">{{ text('Connecting…', 'Đang kết nối…') }}</p> }
+      @case ('offline') { <p role="status">{{ text('Connection lost.', 'Mất kết nối.') }}</p> }
+    }
+    @if (connection.error(); as error) { <p role="alert">{{ feedback(error) }}</p> }
+    @if (connection.room(); as room) {
+      <div class="panel">
+        <header>
+          <h2>{{ game() ? text(game()!.names[0], game()!.names[1]) : text('Private room', 'Phòng riêng') }}</h2>
+          <button type="button" class="secondary" (click)="leave()">{{ text('Leave room', 'Rời phòng') }}</button>
+        </header>
+        <ul class="players" [attr.aria-label]="text('Players', 'Người chơi')">
+          @for (player of room.players; track $index) {
+            <li>
+              <strong>{{ player.name }}{{ room.seat === $index ? text(' (you)', ' (bạn)') : '' }}</strong>
+              <span>{{ player.connected ? text('Connected', 'Đã kết nối') : text('Away', 'Mất kết nối') }}</span>
+            </li>
+          }
+        </ul>
+        @if (room.seat === 0 && room.phase !== 'PLAYING') {
+          <div class="game-options" [attr.aria-label]="text('Choose a game', 'Chọn trò chơi')">
+            @for (option of games; track option.id) {
+              <button type="button" class="secondary" [disabled]="!online() || option.id === room.game"
+                [attr.aria-pressed]="option.id === room.game" (click)="connection.command('select', { game: option.id })">
+                {{ text(option.names[0], option.names[1]) }}
+              </button>
+            }
+          </div>
+        }
+        @switch (room.phase) {
+          @case ('WAITING') {
+            <label for="invite-link">{{ text('Invite your partner', 'Mời người ấy') }}</label>
+            <div class="input-row">
+              <input id="invite-link" readonly [value]="invite(room.room)" (focus)="$any($event.target).select()">
+              <button type="button" (click)="copyInvite(room.room)">
+                {{ copied() ? text('Copied', 'Đã sao chép') : text('Copy link', 'Sao chép') }}
+              </button>
+            </div>
+          }
+        }
+        @if (room.phase === 'RESULTS' && winner() !== null) {
+          <h3>{{ winner()! < 0 ? text('Tie', 'Hòa') : room.players[winner()!].name + text(' wins', ' thắng') }}</h3>
+        }
+        @if (viewFailed()) {
+          <p role="alert">{{ text('Could not load this game. Reload the page to retry.', 'Không tải được trò chơi. Hãy tải lại trang.') }}</p>
+        } @else {
+          <ng-container *ngComponentOutlet="gameView(); inputs: { room: room, vietnamese: vietnamese() }" />
+        }
+        @if (room.phase === 'READY') {
+          @if (game(); as selected) { <p>{{ text(selected.instructions[0], selected.instructions[1]) }}</p> }
+          <button type="button" (click)="connection.command('ready')" [disabled]="!online() || !gameView() || room.players[room.seat].ready">
+            {{ room.players[room.seat].ready ? text('Waiting for partner', 'Đang chờ người ấy') : text('Ready', 'Sẵn sàng') }}
+          </button>
+        }
+        @if (room.phase === 'RESULTS') {
+          <button type="button" (click)="connection.command('rematch')" [disabled]="!online() || room.players[room.seat].ready">
+            {{ room.players[room.seat].ready ? text('Waiting for partner', 'Đang chờ người ấy') : text('Rematch', 'Chơi lại') }}
+          </button>
+        }
+      </div>
+    } @else if (online()) {
+      <div class="panel launcher">
+        <h2>{{ text('Create a private room', 'Tạo phòng riêng') }}</h2>
+        <div class="game-options">
+          @for (option of games; track option.id) {
+            <button type="button" (click)="connection.create(option.id)">{{ text(option.names[0], option.names[1]) }}</button>
+          }
+        </div>
+        <form (submit)="$event.preventDefault(); connection.join(code.value)">
+          <label for="party-code">{{ text('Have a room code?', 'Bạn có mã phòng?') }}</label>
+          <div class="input-row">
+            <input id="party-code" #code required maxlength="32" autocomplete="off" spellcheck="false">
+            <button type="submit" class="secondary">{{ text('Join room', 'Vào phòng') }}</button>
+          </div>
+        </form>
+      </div>
+    }
+  </section>
+</app-member-layout>

@@ -1,0 +1,126 @@
+@if (room().phase === 'WAITING' || room().phase === 'READY') {
+  @if (room().seat === 0) {
+    <fieldset>
+      <legend>{{ tr('Session settings', 'Cài đặt lượt chơi') }}</legend>
+      <label>{{ tr('Mode', 'Chế độ') }}
+        <select [ngModel]="configuration().mode" (ngModelChange)="setMode($event)">
+          @for (mode of modes; track mode[0]) { <option [value]="mode[0]">{{ local(mode[1]) }}</option> }
+        </select>
+      </label>
+      <fieldset class="categories">
+        <legend>{{ tr('Question categories', 'Chủ đề câu hỏi') }}</legend>
+        @for (item of categories; track item[0]) {
+          <label>
+            <input type="checkbox" [checked]="configuration().categories.includes(item[0])"
+              (change)="toggleCategory(item[0])"> {{ local(item[1]) }}
+          </label>
+        }
+      </fieldset>
+      <label>{{ tr('Number of questions', 'Số câu hỏi') }}
+        <input type="number" min="1" [max]="maxCount()" [ngModel]="configuration().count" (ngModelChange)="setCount($event)">
+      </label>
+      <button type="button" class="secondary" [disabled]="!canSend() || !changed() || !configuration().count || configuration().count > maxCount()"
+        (click)="save()">{{ tr('Save settings', 'Lưu cài đặt') }}</button>
+    </fieldset>
+  } @else {
+    <p>{{ modeName(settings().mode) }} · {{ settings().count }} {{ tr(settings().count === 1 ? 'question' : 'questions', 'câu hỏi') }}</p>
+  }
+}
+
+@if (state(); as game) {
+  @if (game.question; as question) {
+    <p>{{ category(question.category) }} · {{ game.index + 1 }} / {{ game.count }}</p>
+    <h3>{{ local(question.prompt) }}</h3>
+    @switch (game.stage) {
+      @case ('answer') {
+        @if (game.submitted[room().seat]) {
+          <p role="status">{{ tr('Answer submitted. Waiting for your partner.', 'Đã gửi câu trả lời. Đang chờ người ấy.') }}</p>
+        } @else {
+          @if (game.mode === 'deep') {
+            <label>{{ tr('Your answer', 'Câu trả lời của bạn') }}
+              <textarea maxlength="500" [ngModel]="response().answer" (ngModelChange)="answer('answer', $event)"></textarea>
+            </label>
+          } @else {
+            <fieldset>
+              <legend>{{ tr('Your answer', 'Câu trả lời của bạn') }}</legend>
+              @for (choice of question.choices; track $index) {
+                <label><input type="radio" name="my-choice" [checked]="response().choice === $index"
+                  (change)="answer('choice', $index)"> {{ local(choice) }}</label>
+              }
+            </fieldset>
+            @if (game.mode === 'guess') {
+              <fieldset>
+                <legend>{{ tr('What will your partner choose?', 'Bạn đoán người ấy sẽ chọn gì?') }}</legend>
+                @for (choice of question.choices; track $index) {
+                  <label><input type="radio" name="partner-guess" [checked]="response().guess === $index"
+                    (change)="answer('guess', $index)"> {{ local(choice) }}</label>
+                }
+              </fieldset>
+            }
+          }
+        }
+        <div class="actions">
+          @if (!game.submitted[room().seat]) {
+            <button type="button" (click)="action('submit', game)" [disabled]="!canSend() ||
+              (game.mode === 'deep' ? !response().answer.trim() : response().choice < 0 || (game.mode === 'guess' && response().guess < 0))">
+              {{ tr('Submit answer', 'Gửi câu trả lời') }}
+            </button>
+          }
+          <button type="button" class="secondary" (click)="action('skip', game)" [disabled]="!canSend()">
+            {{ tr('Skip question', 'Bỏ qua câu hỏi') }}
+          </button>
+        </div>
+      }
+      @case ('revealed') {
+        <div class="answers">
+          @for (item of game.responses; track $index) {
+            <div class="answer">
+              <h4>{{ room().players[$index].name }}</h4>
+              <p class="reply">{{ item.text ?? selection(question.choices, item.choice) }}</p>
+              @if (game.mode === 'guess') {
+                <p>{{ tr('Prediction', 'Dự đoán') }} · {{ selection(question.choices, item.guess) }}</p>
+              }
+            </div>
+          }
+        </div>
+        @if (game.mode === 'same') {
+          <p>{{ game.responses?.[0]?.choice === game.responses?.[1]?.choice
+            ? tr('You chose the same answer.', 'Hai bạn chọn cùng một câu trả lời.')
+            : tr('You chose different answers.', 'Hai bạn chọn hai câu trả lời khác nhau.') }}</p>
+        }
+        <p>{{ tr('Take a moment to talk about your answers.', 'Hãy dành chút thời gian trò chuyện về câu trả lời.') }}</p>
+        <form class="discussion" (ngSubmit)="discuss(game)">
+          <ul class="discussion-log" aria-live="polite">
+            @for (line of game.discussion; track $index) {
+              <li><strong>{{ room().players[line.seat].name }}</strong> · {{ line.message }}</li>
+            }
+          </ul>
+          <label>{{ tr('Discuss this answer', 'Trò chuyện về câu trả lời') }}
+            <textarea name="discussion" maxlength="300" [ngModel]="message()" (ngModelChange)="message.set($event)"></textarea>
+          </label>
+          <button type="submit" class="secondary" [disabled]="!canSend() || !message().trim() || (game.discussion?.length ?? 0) >= 24">
+            {{ tr('Send message', 'Gửi tin nhắn') }}
+          </button>
+        </form>
+      }
+      @case ('skipped') { <p role="status">{{ tr('Question skipped.', 'Đã bỏ qua câu hỏi.') }}</p> }
+    }
+    @if (game.stage === 'revealed' || game.stage === 'skipped') {
+      <button type="button" [disabled]="!canSend() || game.next[room().seat]" (click)="action('next', game)">
+        {{ game.next[room().seat] ? tr('Waiting for partner', 'Đang chờ người ấy')
+          : game.index + 1 === game.count ? tr('Finish session', 'Kết thúc') : tr('Next question', 'Câu tiếp theo') }}
+      </button>
+    }
+  } @else if (game.stage === 'finished') {
+    <p>{{ tr('Answered', 'Đã trả lời') }} {{ game.answered }} · {{ tr('Skipped', 'Đã bỏ qua') }} {{ game.skipped }}</p>
+    @if (game.mode === 'guess') {
+      @for (score of game.scores; track $index) {
+        <p>{{ room().players[$index].name }} · {{ score }} {{ tr('correct predictions', 'dự đoán đúng') }}</p>
+      }
+    }
+    @if (game.mode === 'same') {
+      <p>{{ tr('Same answers', 'Câu trả lời giống nhau') }} {{ game.matches }} ·
+        {{ tr('Different answers', 'Câu trả lời khác nhau') }} {{ game.answered - game.matches }}</p>
+    }
+  }
+}

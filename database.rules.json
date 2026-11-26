@@ -2,6 +2,132 @@
   "rules": {
     ".read": false,
     ".write": false,
+    "coupleGames": {
+    "$room": {
+      ".write": "auth != null && $room.matches(/^[0-9a-f]{32}$/) && !data.exists() && newData.hasChildren(['meta','stream']) && newData.child('meta').child('host').child('uid').val() === auth.uid && !newData.child('meta').child('guest').exists() && newData.child('stream').child('head').val() === 0 && !newData.child('stream').child('items').exists() && !newData.child('private').exists() && !newData.child('presence').exists()",
+      "meta": {
+        ".read": "auth != null && (root.child('coupleGames').child($room).child('meta').child('host').child('uid').val() === auth.uid || root.child('coupleGames').child($room).child('meta').child('guest').child('uid').val() === auth.uid)",
+        ".validate": "newData.hasChildren(['host','game'])",
+        "host": {
+          ".validate": "newData.hasChildren(['uid','name'])",
+          "uid": {
+            ".validate": "newData.isString() && newData.val() === auth.uid"
+          },
+          "name": {
+            ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 60"
+          },
+          "$other": {
+            ".validate": false
+          }
+        },
+        "game": {
+          ".validate": "newData.val() === 'couple-questions' || newData.val() === 'puzzle-battle'"
+        },
+        "guest": {
+          ".validate": "newData.hasChildren(['uid','name'])",
+          "uid": {
+            ".validate": "newData.isString() && newData.val() === auth.uid"
+          },
+          "name": {
+            ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 60"
+          },
+          "$other": {
+            ".validate": false
+          },
+          ".write": "auth != null && root.child('coupleGames').child($room).child('meta').child('host').child('uid').val() !== auth.uid && !root.child('coupleGames').child($room).child('meta').child('guest').exists() && !data.exists() && newData.exists() && newData.parent().parent().child('stream').child('head').val() === root.child('coupleGames').child($room).child('stream').child('head').val() + 1 && newData.parent().parent().child('stream').child('items').child('' + newData.parent().parent().child('stream').child('head').val()).child('type').val() === 'join' && newData.parent().parent().child('stream').child('items').child('' + newData.parent().parent().child('stream').child('head').val()).child('uid').val() === auth.uid"
+        },
+        "$other": {
+          ".validate": false
+        }
+      },
+      "stream": {
+        ".read": "auth != null && (root.child('coupleGames').child($room).child('meta').child('host').child('uid').val() === auth.uid || root.child('coupleGames').child($room).child('meta').child('guest').child('uid').val() === auth.uid)",
+        "head": {
+          ".read": "auth != null && $room.matches(/^[0-9a-f]{32}$/)",
+          ".write": "(auth != null && (root.child('coupleGames').child($room).child('meta').child('host').child('uid').val() === auth.uid || root.child('coupleGames').child($room).child('meta').child('guest').child('uid').val() === auth.uid) || auth != null && root.child('coupleGames').child($room).child('meta').child('host').child('uid').val() !== auth.uid && !root.child('coupleGames').child($room).child('meta').child('guest').exists()) && data.isNumber() && newData.isNumber() && newData.val() === data.val() + 1 && newData.parent().child('items').child('' + newData.val()).child('uid').val() === auth.uid",
+          ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 12000 && newData.val() % 1 === 0"
+        },
+        "items": {
+          "$id": {
+            ".write": "!data.exists() && newData.exists() && newData.child('uid').val() === auth.uid && (newData.child('type').val() === 'join' && auth != null && root.child('coupleGames').child($room).child('meta').child('host').child('uid').val() !== auth.uid && !root.child('coupleGames').child($room).child('meta').child('guest').exists() && newData.parent().parent().parent().child('meta').child('guest').child('uid').val() === auth.uid || (newData.child('type').val() !== 'join' && (auth != null && (root.child('coupleGames').child($room).child('meta').child('host').child('uid').val() === auth.uid || root.child('coupleGames').child($room).child('meta').child('guest').child('uid').val() === auth.uid)))) && newData.parent().parent().parent().child('stream').child('head').val() === root.child('coupleGames').child($room).child('stream').child('head').val() + 1 && $id === ('' + newData.parent().parent().parent().child('stream').child('head').val())",
+            ".validate": "newData.hasChildren(['uid','type','kind','prompt','round','revision','payload','at']) && ((newData.child('kind').val() !== 'submit' && newData.child('kind').val() !== 'skip') || (newData.child('type').val() === 'play' && newData.child('prompt').val().matches(/^[0-9]+_[0-9]+$/) && ((newData.child('kind').val() === 'submit' && !root.child('coupleGames').child($room).child('private').child(newData.child('prompt').val()).child('answers').child(auth.uid).exists() && newData.parent().parent().parent().child('private').child(newData.child('prompt').val()).child('answers').child(auth.uid).exists() && !newData.parent().parent().parent().child('private').child(newData.child('prompt').val()).child('skipped').exists()) || (newData.child('kind').val() === 'skip' && !root.child('coupleGames').child($room).child('private').child(newData.child('prompt').val()).child('skipped').exists() && newData.parent().parent().parent().child('private').child(newData.child('prompt').val()).child('skipped').val() === auth.uid))))",
+            "uid": {
+              ".validate": "newData.isString() && newData.val() === auth.uid"
+            },
+            "type": {
+              ".validate": "newData.isString() && newData.val().matches(/^(join|ready|play|rematch|select|configure|tick)$/)"
+            },
+            "kind": {
+              ".validate": "newData.isString() && newData.val().matches(/^(submit|skip|next|discuss)?$/)"
+            },
+            "prompt": {
+              ".validate": "newData.isString() && newData.val().matches(/^([0-9]+_[0-9]+)?$/)"
+            },
+            "round": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() % 1 === 0"
+            },
+            "revision": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() % 1 === 0"
+            },
+            "payload": {
+              ".validate": "newData.isString() && newData.val().length <= 1800"
+            },
+            "at": {
+              ".validate": "newData.isNumber() && newData.val() === now"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        },
+        "$other": {
+          ".validate": false
+        }
+      },
+      "private": {
+        "$prompt": {
+          "answers": {
+            "$uid": {
+              ".read": "(auth != null && (root.child('coupleGames').child($room).child('meta').child('host').child('uid').val() === auth.uid || root.child('coupleGames').child($room).child('meta').child('guest').child('uid').val() === auth.uid)) && (auth.uid === $uid || (data.parent().parent().child('answers').child(root.child('coupleGames').child($room).child('meta').child('host').child('uid').val()).exists() && data.parent().parent().child('answers').child(root.child('coupleGames').child($room).child('meta').child('guest').child('uid').val()).exists() && !data.parent().parent().child('skipped').exists()))",
+              ".write": "(auth != null && (root.child('coupleGames').child($room).child('meta').child('host').child('uid').val() === auth.uid || root.child('coupleGames').child($room).child('meta').child('guest').child('uid').val() === auth.uid)) && auth.uid === $uid && !data.exists() && newData.exists() && $prompt.matches(/^[0-9]+_[0-9]+$/) && !newData.parent().parent().child('skipped').exists() && newData.parent().parent().parent().parent().child('stream').child('head').val() === root.child('coupleGames').child($room).child('stream').child('head').val() + 1 && newData.parent().parent().parent().parent().child('stream').child('items').child('' + newData.parent().parent().parent().parent().child('stream').child('head').val()).child('kind').val() === 'submit' && newData.parent().parent().parent().parent().child('stream').child('items').child('' + newData.parent().parent().parent().parent().child('stream').child('head').val()).child('prompt').val() === $prompt && newData.parent().parent().parent().parent().child('stream').child('items').child('' + newData.parent().parent().parent().parent().child('stream').child('head').val()).child('uid').val() === auth.uid",
+              ".validate": "(newData.child('answer').exists() && !newData.child('choice').exists() && !newData.child('guess').exists()) || (!newData.child('answer').exists() && newData.child('choice').exists())",
+              "answer": {
+                ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 500"
+              },
+              "choice": {
+                ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 3 && newData.val() % 1 === 0"
+              },
+              "guess": {
+                ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 3 && newData.val() % 1 === 0"
+              },
+              "$other": {
+                ".validate": false
+              }
+            }
+          },
+          "skipped": {
+            ".write": "(auth != null && (root.child('coupleGames').child($room).child('meta').child('host').child('uid').val() === auth.uid || root.child('coupleGames').child($room).child('meta').child('guest').child('uid').val() === auth.uid)) && !data.exists() && newData.val() === auth.uid && $prompt.matches(/^[0-9]+_[0-9]+$/) && !(newData.parent().child('answers').child(root.child('coupleGames').child($room).child('meta').child('host').child('uid').val()).exists() && newData.parent().child('answers').child(root.child('coupleGames').child($room).child('meta').child('guest').child('uid').val()).exists()) && newData.parent().parent().parent().child('stream').child('head').val() === root.child('coupleGames').child($room).child('stream').child('head').val() + 1 && newData.parent().parent().parent().child('stream').child('items').child('' + newData.parent().parent().parent().child('stream').child('head').val()).child('kind').val() === 'skip' && newData.parent().parent().parent().child('stream').child('items').child('' + newData.parent().parent().parent().child('stream').child('head').val()).child('prompt').val() === $prompt && newData.parent().parent().parent().child('stream').child('items').child('' + newData.parent().parent().parent().child('stream').child('head').val()).child('uid').val() === auth.uid",
+            ".validate": "newData.isString()"
+          },
+          "$other": {
+            ".validate": false
+          }
+        }
+      },
+      "presence": {
+        ".read": "auth != null && (root.child('coupleGames').child($room).child('meta').child('host').child('uid').val() === auth.uid || root.child('coupleGames').child($room).child('meta').child('guest').child('uid').val() === auth.uid)",
+        "$uid": {
+          "$session": {
+            ".write": "(auth != null && (root.child('coupleGames').child($room).child('meta').child('host').child('uid').val() === auth.uid || root.child('coupleGames').child($room).child('meta').child('guest').child('uid').val() === auth.uid)) && auth.uid === $uid",
+            ".validate": "newData.val() === true"
+          }
+        }
+      },
+      "$other": {
+        ".validate": false
+      }
+    }
+    },
     "heartBlocks": {
       "$code": {
         ".read": "auth != null && (auth.uid === root.child('heartBlocks').child($code).child('host').val() || auth.uid === root.child('heartBlocks').child($code).child('guest').val())",

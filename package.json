@@ -10,6 +10,10 @@
     "firebase:login": "firebase login",
     "predeploy": "npm run build",
     "deploy": "firebase deploy --only hosting --project plocandnhi",
+    "predeploy:games": "npm run build",
+    "deploy:games": "firebase deploy --only database,hosting --project plocandnhi",
+    "test:games": "node --test scripts/test-couple-game-replay.mjs",
+    "test:games:firebase": "firebase emulators:exec --project demo-and-va-em --only database \"node scripts/test-couple-games-rules.mjs\"",
     "deploy:rules": "firebase deploy --only database --project plocandnhi",
     "test:rules": "firebase emulators:exec --project demo-and-va-em --only database \"node scripts/test-database-rules.mjs\""
   },
@@ -23,6 +27,7 @@
     "@angular/platform-browser": "^22.3.0",
     "@angular/router": "^22.3.0",
     "firebase": "^13.4.0",
+    "phaser": "3.90.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
   },

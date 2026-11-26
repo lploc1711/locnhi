@@ -7,6 +7,7 @@ import {
   signal,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { PARTY_ROOM_CODE } from '../../couple-party/party-room-code';
 import { Brand } from '../../shared/brand/brand';
 import { AuthService } from '../auth.service';
 
@@ -45,7 +46,10 @@ export class Login {
     this.navigationError.set(false);
     try {
       const invite = this.route.snapshot.queryParamMap.get('heartRoom') ?? '';
-      const destination = /^[0-9a-f]{24}$/.test(invite)
+      const party = this.route.snapshot.queryParamMap.get('partyRoom') ?? '';
+      const destination = PARTY_ROOM_CODE.test(party)
+        ? this.router.createUrlTree(['/games', 'party'], { queryParams: { room: party } })
+        : /^[0-9a-f]{24}$/.test(invite)
         ? this.router.createUrlTree(['/games', 'block-blast'], { queryParams: { room: invite } })
         : '/home';
       if (!(await this.router.navigateByUrl(destination, { replaceUrl: true }))) {

@@ -1,0 +1,26 @@
+:host { display: block; }
+fieldset { margin: 14px 0; padding: 12px; border: 1px solid #dfc5d4; border-radius: 12px; }
+fieldset label { display: block; margin-bottom: 10px; }
+button, select { font: inherit; min-height: 44px; padding: 8px 12px; border: 1px solid #b98ca7; border-radius: 10px; color: #562b49; background: #fff; }
+button { font-weight: 700; cursor: pointer; }
+button[aria-pressed=true] { background: #82395f; color: #fff; }
+button:disabled { opacity: .65; }
+.scoreboard, .progress { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.scoreboard { padding: 0; list-style: none; }
+.scoreboard li { display: grid; gap: 2px; padding: 8px 10px; background: #f5e3ef; border-radius: 10px; overflow-wrap: anywhere; }
+.scoreboard span { font-variant-numeric: tabular-nums; }
+.timing, .pieces, .piece-controls { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; }
+.timing { justify-content: space-between; }
+h3 { margin: 6px 0; }
+.countdown { text-align: center; font-size: clamp(1.4rem, 6vw, 2.1rem); font-weight: 750; padding: 26px 12px; }
+.progress { margin: 12px 0; }
+.progress label { min-width: 0; overflow-wrap: anywhere; }
+progress { width: 100%; accent-color: #82395f; }
+.pattern { display: flex; justify-content: center; flex-wrap: wrap; gap: 4px; }
+.pattern span { min-width: 1.4em; text-align: center; padding: 3px; border-radius: 5px; background: #f4e2ef; font-size: clamp(1.1rem, 4.5vw, 1.6rem); }
+.clue { font-size: 1.15rem; font-weight: 650; }
+.pieces button { min-width: 44px; }
+.piece-controls { margin-top: 8px; }
+.preview { display: grid; grid-template-columns: repeat(4, 8px); grid-auto-rows: 8px; gap: 2px; }
+.preview .filled { background: #82395f; border-radius: 2px; }
+.results { padding-left: 22px; }

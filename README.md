@@ -215,3 +215,12 @@ setup is described in the Firebase GitHub integration guide linked above.
 Open **Games → Block Blast** after signing in. Create a private room and share the invite link. A second Google account can join. Drag a piece, or select a piece then tap a board cell. Each player gets the same piece sequence and sees both scores. The higher score wins when both boards finish. A player who runs out of moves can ask for a rematch immediately. The next round starts after both players agree and the current round is finished. Older invite links still work. A copied invite also restores a player's board when reopening the room.
 
 The tab uses the existing Firebase Realtime Database. Apply the checked-in database rules to the same project as Hosting when releasing this feature. Run `npm run test:rules` for the local access and match protocol tests. Scores are replayed from each participant's append-only moves on both clients. This is a private casual game.
+
+
+## Couple Games
+
+Open **Games → Couple Games** and create a private room for Couple Questions or Puzzle Battle. Share the invitation with a second signed-in player. The host chooses the session settings and both players select **Ready**.
+
+Couple Games uses the existing Firebase Authentication and connects directly to Firebase Realtime Database. Each browser applies the same game rules to the room's ordered move log. Database rules restrict room access and reveal question answers only after both submissions. Revealed answers and discussion are kept in the private room so a match can be restored. Puzzle Battle is designed for casual matches between trusted players because browsers can inspect their puzzle data.
+
+Run `npm.cmd run deploy:games` to publish the Realtime Database rules and Angular build to `plocandnhi`. Run `npm.cmd run test:games` for the game engine and `npm.cmd run test:games:firebase` for the Firebase rules and two-player protocol.
